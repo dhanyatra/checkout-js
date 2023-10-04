@@ -113,7 +113,7 @@ interface DhanyatraOptions {
 
 export class Dhanyatra {
   options: DhanyatraOptions;
-  private baseUrl: string = 'http://localhost:5173';
+  private baseUrl: string = 'https://payment.dhanyatra.brighthustle.in';
 
   constructor(options: DhanyatraOptions) {
     if (!options) {
