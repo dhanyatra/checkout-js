@@ -1,0 +1,75 @@
+{
+  "name": "@dhanyatra/checkout-js",
+  "version": "0.0.1",
+  "description": "Check Js Module For Instant Web Checkout",
+  "keywords": [
+    "client",
+    "payment-gateway",
+    "web-checkout"
+  ],
+  "author": "Kumar Yash",
+  "license": "MIT",
+  "type": "module",
+  "source": "src/checkout.ts",
+  "exports": {
+    "require": "./build/checkout.cjs",
+    "default": "./build/checkout.modern.js"
+  },
+  "main": "./build/checkout.js",
+  "module": "./build/checkout.module.js",
+  "unpkg": "./build/checkout.umd.js",
+  "scripts": {
+    "clean": "del-cli build",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --ext=.ts",
+    "format": "prettier --write .",
+    "pretest": "npm run lint",
+    "build": "microbundle",
+    "dev": "microbundle watch",
+    "microbundle-standalone": "microbundle -o dist/index.standalone.js --external none --format umd --sourcemap false",
+    "release": "np --message=\"chore(release): %s\" --no-tests ",
+    "version": "npm run build",
+    "prepublishOnly": "npm run build"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.23.0",
+    "@babel/preset-env": "^7.22.20",
+    "babel-jest": "^29.7.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-import": "^2.28.1",
+    "eslint-plugin-prettier": "^5.0.0",
+    "del-cli": "^5.0.0",
+    "eslint": "^8.44.0",
+    "microbundle": "^0.15.1",
+    "np": "^8.0.4",
+    "prettier": "^3.0.0",
+    "typescript": "^5.1.6"
+  },
+  "files": [
+    "src",
+    "build"
+  ],
+  "engines": {
+    "node": ">=18.16.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "tag": "latest"
+  },
+  "np": {
+    "message": "chore(release): %s",
+    "tag": "latest",
+    "branch": "main",
+    "anyBranch": false
+  },
+  "types": "./build/checkout.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DhanYatra/checkout-js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/DhanYatra/checkout-js/issues"
+  },
+  "homepage": "https://github.com/DhanYatra/checkout-js#readme"
+}
