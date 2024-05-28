@@ -1,46 +1,46 @@
 // Create a new div element
-const newDiv = document.createElement('div');
+const newDiv = document.createElement("div");
 
 // Add some content to the div (optional)
 newDiv.innerHTML =
-  '<style>.dhanyatra-container > iframe {min-height: 100%!important;}</style>';
+  "<style>.dhanyatra-container > iframe {min-height: 100%!important;}</style>";
 
 // Add a class and inline styles to the div
-newDiv.className = 'dhanyatra-container';
+newDiv.className = "dhanyatra-container";
 newDiv.style.cssText =
-  'z-index: 2147483647; position: fixed; top: 0px; display: none; left: 0px; height: 100%; width: 100%; backface-visibility: hidden; overflow-y: visible;';
+  "z-index: 2147483647; position: fixed; top: 0px; display: none; left: 0px; height: 100%; width: 100%; backface-visibility: hidden; overflow-y: visible;";
 
 // Create another div element for the backdrop
-const backdropDiv = document.createElement('div');
-backdropDiv.className = 'dhanyatra-backdrop';
+const backdropDiv = document.createElement("div");
+backdropDiv.className = "dhanyatra-backdrop";
 
-const spinnerDiv = document.createElement('div');
-spinnerDiv.className = 'dhanyatra-loader';
+const spinnerDiv = document.createElement("div");
+spinnerDiv.className = "dhanyatra-loader";
 
 // Add styles to the backdrop div
 const backdropStyles = {
-  'min-height': '100%',
-  transition: '0.3s ease-out',
-  position: 'fixed',
-  top: '0',
-  left: '0',
-  width: '100%',
-  height: '100%',
-  background: 'rgba(0, 0, 0, 0.6)',
-  display: 'flex',
-  'justify-content': 'center',
-  'align-items': 'center',
+  "min-height": "100%",
+  transition: "0.3s ease-out",
+  position: "fixed",
+  top: "0",
+  left: "0",
+  width: "100%",
+  height: "100%",
+  background: "rgba(0, 0, 0, 0.6)",
+  display: "flex",
+  "justify-content": "center",
+  "align-items": "center",
 };
 
 const loaderStyles = {
-  border: '5px solid #ffffff' /* Light grey */,
-  'border-bottom-color': 'transparent',
-  'border-radius': '50%',
-  display: 'inline-block',
-  'box-sizing': 'border-box',
-  width: '48px',
-  height: '48px',
-  animation: 'spin 2s linear infinite',
+  border: "5px solid #ffffff" /* Light grey */,
+  "border-bottom-color": "transparent",
+  "border-radius": "50%",
+  display: "inline-block",
+  "box-sizing": "border-box",
+  width: "48px",
+  height: "48px",
+  animation: "spin 2s linear infinite",
 };
 
 for (const prop in backdropStyles) {
@@ -113,11 +113,11 @@ interface DhanyatraOptions {
 
 export class Dhanyatra {
   options: DhanyatraOptions;
-  private baseUrl: string = 'https://payment.dhanyatra.brighthustle.in';
+  private baseUrl: string = "https://checkout.dhanyatra.brighthustle.in";
 
   constructor(options: DhanyatraOptions) {
     if (!options) {
-      throw new Error('Options must be provided to the Dhanyatra constructor.');
+      throw new Error("Options must be provided to the Dhanyatra constructor.");
     }
     this.options = options;
     this.attachEventListener();
@@ -125,37 +125,37 @@ export class Dhanyatra {
 
   close() {
     const iframe = document.getElementById(
-      'dhanyatraIframe'
+      "dhanyatraIframe"
     ) as HTMLIFrameElement;
     if (iframe) {
       iframe.parentNode?.removeChild(iframe);
-      newDiv.style.display = 'none';
+      newDiv.style.display = "none";
       this.removeEventListener();
     }
   }
 
   open() {
     if (!this.options.order_id) {
-      throw new Error('Order ID is required');
+      throw new Error("Order ID is required");
     }
     // When you call this method, it will display the dhanyatra-container
-    newDiv.style.display = 'block';
+    newDiv.style.display = "block";
     // Create an iframe element
-    const iframe = document.createElement('iframe');
-    iframe.setAttribute('id', 'dhanyatraIframe');
-    iframe.style.opacity = '1';
-    iframe.style.height = '100%';
-    iframe.style.position = 'relative';
-    iframe.style.background = 'none';
-    iframe.style.display = 'block';
-    iframe.style.border = '0px none transparent';
-    iframe.style.margin = '0px';
-    iframe.style.padding = '0px';
-    iframe.style.zIndex = '2';
-    iframe.style.width = '100%';
-    iframe.frameBorder = '0';
+    const iframe = document.createElement("iframe");
+    iframe.setAttribute("id", "dhanyatraIframe");
+    iframe.style.opacity = "1";
+    iframe.style.height = "100%";
+    iframe.style.position = "relative";
+    iframe.style.background = "none";
+    iframe.style.display = "block";
+    iframe.style.border = "0px none transparent";
+    iframe.style.margin = "0px";
+    iframe.style.padding = "0px";
+    iframe.style.zIndex = "2";
+    iframe.style.width = "100%";
+    iframe.frameBorder = "0";
 
-    iframe.setAttribute('allowTransparency', 'true');
+    iframe.setAttribute("allowTransparency", "true");
 
     // Set the source URL for the iframe
     iframe.src = this.baseUrl;
@@ -166,11 +166,11 @@ export class Dhanyatra {
     // Convert the data to a JSON string
     const messageString = JSON.stringify(this.options);
     // Send the data to the iframe
-    iframe.addEventListener('load', () => {
+    iframe.addEventListener("load", () => {
       // This function will be called when the iframe has fully loaded
       // spinnerDiv.style.display = 'none'
       setTimeout(() => {
-        iframe.contentWindow?.postMessage(messageString, '*');
+        iframe.contentWindow?.postMessage(messageString, "*");
       }, 1000);
 
       // Now, you can safely send data to the iframe or perform other actions.
@@ -178,11 +178,11 @@ export class Dhanyatra {
   }
 
   private attachEventListener() {
-    window.addEventListener('message', (event) => this.handleMessage(event));
+    window.addEventListener("message", (event) => this.handleMessage(event));
   }
 
   private removeEventListener() {
-    window.removeEventListener('message', (event) => this.handleMessage(event));
+    window.removeEventListener("message", (event) => this.handleMessage(event));
   }
 
   private handleMessage = (event) => {
@@ -195,10 +195,10 @@ export class Dhanyatra {
 
     // Handle different message types
     switch (data) {
-      case 'dismissModal':
+      case "dismissModal":
         this.handleDismissModal();
         break;
-      case 'paymentResponse':
+      case "paymentResponse":
         this.handlePaymentResponse(data);
         break;
       // Add more cases as needed
@@ -217,11 +217,11 @@ export class Dhanyatra {
     //   this.options.modal.ondismiss();
     // }
     const iframe = document.getElementById(
-      'dhanyatraIframe'
+      "dhanyatraIframe"
     ) as HTMLIFrameElement;
     if (iframe) {
       iframe.parentNode?.removeChild(iframe);
-      newDiv.style.display = 'none';
+      newDiv.style.display = "none";
       this.removeEventListener();
     }
   };
@@ -230,7 +230,7 @@ export class Dhanyatra {
     if (
       this.options &&
       this.options.handler &&
-      typeof this.options.handler === 'function'
+      typeof this.options.handler === "function"
     ) {
       this.options.handler(paymentData);
     }
@@ -239,13 +239,13 @@ export class Dhanyatra {
   private async createOrder(orderPayload: OrderCreatePayload) {
     try {
       if (!this.options.key) {
-        throw new Error('App key is missing');
+        throw new Error("App key is missing");
       }
       const orderResponse = await fetch(`${this.baseUrl}/api/checkout/orders`, {
-        method: 'POST',
+        method: "POST",
         headers: {
           Authorization: `Bearer ${this.options.key}`,
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(orderPayload),
       });
