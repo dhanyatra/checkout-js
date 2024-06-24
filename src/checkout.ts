@@ -108,6 +108,7 @@ interface DhanyatraOptions {
   };
   modal: {
     ondismiss: () => void;
+    onSuccess: (response: any) => void;
   };
 }
 
@@ -198,24 +199,15 @@ export class Dhanyatra {
       case "dismissModal":
         this.handleDismissModal();
         break;
-      case "paymentResponse":
-        this.handlePaymentResponse(data);
-        break;
-      // Add more cases as needed
       default:
-        break;
+				if (data.action === 'paymentSuccess') {
+					this.handlePaymentResponse(data.data);
+				}
+				break;
     }
   };
 
   private handleDismissModal = () => {
-    // if (
-    //   this.options &&
-    //   this.options.modal &&
-    //   typeof this.options.modal.ondismiss === 'function'
-    // ) {
-    //   console.log('test');
-    //   this.options.modal.ondismiss();
-    // }
     const iframe = document.getElementById(
       "dhanyatraIframe"
     ) as HTMLIFrameElement;
@@ -229,10 +221,11 @@ export class Dhanyatra {
   private handlePaymentResponse = (paymentData) => {
     if (
       this.options &&
-      this.options.handler &&
-      typeof this.options.handler === "function"
+      this.options.modal &&
+      typeof this.options.modal.onSuccess === 'function'
     ) {
-      this.options.handler(paymentData);
+      console.log('success');
+      this.options.modal.onSuccess(paymentData);
     }
   };
 
