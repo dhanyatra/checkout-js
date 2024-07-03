@@ -101,7 +101,7 @@ interface DhanyatraOptions {
     org_id: number;
   };
   modal: {
-    onDismiss: () => void;
+    onDismiss: (response: any) => void;
     onSuccess: (response: any) => void;
     onError: (error: any) => void;
   };
@@ -134,25 +134,26 @@ export class Dhanyatra {
   }
 
   open() {
+    spinnerDiv.style.display = "block";
     // When you call this method, it will display the dhanyatra-container
     newDiv.style.display = "block";
     // Create an iframe element
     const iframe = document.createElement("iframe");
     iframe.setAttribute("id", "dhanyatraIframe");
-    iframe.style.opacity = "1";
-    iframe.style.height = "100%";
-    iframe.style.position = "relative";
-    iframe.style.background = "none";
-    iframe.style.display = "block";
-    iframe.style.border = "0px none transparent";
-    iframe.style.margin = "0px";
-    iframe.style.padding = "0px";
-    iframe.style.zIndex = "2";
-    iframe.style.width = "100%";
-    iframe.style.animation = "fadeIn 0.5s forwards";
-
+    Object.assign(iframe.style, {
+      opacity: "0",
+      height: "100%",
+      position: "relative",
+      background: "none",
+      display: "none",
+      border: "0px none transparent",
+      margin: "0px",
+      padding: "0px",
+      zIndex: "2",
+      width: "100%",
+      animation: "fadeIn 0.5s forwards",
+    });
     iframe.frameBorder = "0";
-
     iframe.setAttribute("allowTransparency", "true");
 
     // Set the source URL for the iframe
@@ -163,14 +164,17 @@ export class Dhanyatra {
 
     // Convert the data to a JSON string
     const messageString = JSON.stringify(this.options);
+
     // Send the data to the iframe
     iframe.addEventListener("load", () => {
       // This function will be called when the iframe has fully loaded
-      // spinnerDiv.style.display = 'none'
       setTimeout(() => {
         iframe.contentWindow?.postMessage(messageString, "*");
+      }, 500);
+      setTimeout(() => {
+        spinnerDiv.style.display = "none";
+        iframe.style.display = "block";
       }, 1000);
-
       // Now, you can safely send data to the iframe or perform other actions.
     });
   }
@@ -194,7 +198,7 @@ export class Dhanyatra {
     // Handle different message types
     switch (data.action) {
       case "dismissModal":
-        this.handleDismissModal();
+        this.handleDismissModal(data.data);
         break;
       case "paymentSuccess":
         this.handlePaymentResponse(data.data);
@@ -208,17 +212,12 @@ export class Dhanyatra {
     }
   };
 
-  private handleDismissModal = () => {
+  private handleDismissModal = (data) => {
     const iframe = document.getElementById(
       "dhanyatraIframe"
     ) as HTMLIFrameElement;
     if (iframe) {
-      iframe.style.animation = "fadeOut 0.5s";
-      setTimeout(() => {
-        iframe.parentNode?.removeChild(iframe);
-        newDiv.style.display = "none";
-        this.removeEventListener();
-      }, 500);
+      this.options.modal.onDismiss(data);
     }
   };
 
