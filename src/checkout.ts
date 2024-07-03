@@ -204,7 +204,7 @@ export class Dhanyatra {
         this.handlePaymentResponse(data.data);
         break;
       case "paymentFailed":
-        this.handlePaymentResponse(data.data);
+        this.handleErrorResponse(data.data);
         break;
       default:
         this.handleErrorResponse(data.data);
