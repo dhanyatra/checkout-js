@@ -2,8 +2,12 @@
 const newDiv = document.createElement("div");
 
 // Add some content to the div (optional)
-newDiv.innerHTML =
-  "<style>.dhanyatra-container > iframe {min-height: 100%!important;}</style>";
+newDiv.innerHTML = `<style>
+  .dhanyatra-container > iframe { min-height: 100%!important; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+  @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+</style>`;
 
 // Add a class and inline styles to the div
 newDiv.className = "dhanyatra-container";
@@ -43,13 +47,8 @@ const loaderStyles = {
   animation: "spin 2s linear infinite",
 };
 
-for (const prop in backdropStyles) {
-  backdropDiv.style[prop] = backdropStyles[prop];
-}
-
-for (const prop in loaderStyles) {
-  spinnerDiv.style[prop] = loaderStyles[prop];
-}
+Object.assign(backdropDiv.style, backdropStyles);
+Object.assign(spinnerDiv.style, loaderStyles);
 
 // Append the backdrop div to the newDiv
 backdropDiv.appendChild(spinnerDiv);
@@ -63,11 +62,6 @@ interface PaymentBlock {
     name: string;
     instruments: PaymentInstrument[];
   };
-}
-
-interface OrderCreatePayload {
-  amount: number;
-  currency: string;
 }
 
 interface PaymentInstrument {
@@ -107,8 +101,9 @@ interface DhanyatraOptions {
     org_id: number;
   };
   modal: {
-    ondismiss: () => void;
+    onDismiss: () => void;
     onSuccess: (response: any) => void;
+    onError: (error: any) => void;
   };
 }
 
@@ -129,16 +124,16 @@ export class Dhanyatra {
       "dhanyatraIframe"
     ) as HTMLIFrameElement;
     if (iframe) {
-      iframe.parentNode?.removeChild(iframe);
-      newDiv.style.display = "none";
-      this.removeEventListener();
+      iframe.style.animation = "fadeOut 0.5s";
+      setTimeout(() => {
+        iframe.parentNode?.removeChild(iframe);
+        newDiv.style.display = "none";
+        this.removeEventListener();
+      }, 500);
     }
   }
 
   open() {
-    if (!this.options.order_id) {
-      throw new Error("Order ID is required");
-    }
     // When you call this method, it will display the dhanyatra-container
     newDiv.style.display = "block";
     // Create an iframe element
@@ -154,6 +149,8 @@ export class Dhanyatra {
     iframe.style.padding = "0px";
     iframe.style.zIndex = "2";
     iframe.style.width = "100%";
+    iframe.style.animation = "fadeIn 0.5s forwards";
+
     iframe.frameBorder = "0";
 
     iframe.setAttribute("allowTransparency", "true");
@@ -195,15 +192,19 @@ export class Dhanyatra {
     }
 
     // Handle different message types
-    switch (data) {
+    switch (data.action) {
       case "dismissModal":
         this.handleDismissModal();
         break;
+      case "paymentSuccess":
+        this.handlePaymentResponse(data.data);
+        break;
+      case "paymentFailed":
+        this.handlePaymentResponse(data.data);
+        break;
       default:
-				if (data.action === 'paymentSuccess') {
-					this.handlePaymentResponse(data.data);
-				}
-				break;
+        this.handleErrorResponse(data.data);
+        break;
     }
   };
 
@@ -212,9 +213,12 @@ export class Dhanyatra {
       "dhanyatraIframe"
     ) as HTMLIFrameElement;
     if (iframe) {
-      iframe.parentNode?.removeChild(iframe);
-      newDiv.style.display = "none";
-      this.removeEventListener();
+      iframe.style.animation = "fadeOut 0.5s";
+      setTimeout(() => {
+        iframe.parentNode?.removeChild(iframe);
+        newDiv.style.display = "none";
+        this.removeEventListener();
+      }, 500);
     }
   };
 
@@ -222,29 +226,19 @@ export class Dhanyatra {
     if (
       this.options &&
       this.options.modal &&
-      typeof this.options.modal.onSuccess === 'function'
+      typeof this.options.modal.onSuccess === "function"
     ) {
-      console.log('success');
       this.options.modal.onSuccess(paymentData);
     }
   };
 
-  private async createOrder(orderPayload: OrderCreatePayload) {
-    try {
-      if (!this.options.key) {
-        throw new Error("App key is missing");
-      }
-      const orderResponse = await fetch(`${this.baseUrl}/api/checkout/orders`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${this.options.key}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(orderPayload),
-      });
-      return orderResponse;
-    } catch (error) {
-      throw new Error(error);
+  private handleErrorResponse = (errorData) => {
+    if (
+      this.options &&
+      this.options.modal &&
+      typeof this.options.modal.onError === "function"
+    ) {
+      this.options.modal.onSuccess(errorData);
     }
-  }
+  };
 }
