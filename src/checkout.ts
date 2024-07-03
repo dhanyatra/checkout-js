@@ -237,7 +237,7 @@ export class Dhanyatra {
       this.options.modal &&
       typeof this.options.modal.onError === "function"
     ) {
-      this.options.modal.onSuccess(errorData);
+      this.options.modal.onError(errorData);
     }
   };
 }
