@@ -95,7 +95,6 @@ interface DhanyatraOptions {
       };
     };
   };
-  handler: (response: any) => void;
   ark?: {
     user_id: number;
     org_id: number;
@@ -109,7 +108,11 @@ interface DhanyatraOptions {
 
 export class Dhanyatra {
   options: DhanyatraOptions;
-  private baseUrl: string = "https://checkout.dhanyatra.brighthustle.in";
+  private baseUrl: string = "http://localhost:5173";
+  private eventListenerAttached: boolean = false;
+  private onSuccessHandled: boolean = false;
+  private onDismissHandled: boolean = false;
+  private onErrorHandled: boolean = false;
 
   constructor(options: DhanyatraOptions) {
     if (!options) {
@@ -125,15 +128,18 @@ export class Dhanyatra {
     ) as HTMLIFrameElement;
     if (iframe) {
       iframe.style.animation = "fadeOut 0.5s";
+      this.removeEventListener();
       setTimeout(() => {
         iframe.parentNode?.removeChild(iframe);
         newDiv.style.display = "none";
-        this.removeEventListener();
       }, 500);
     }
   }
 
   open() {
+    this.onSuccessHandled = false;
+    this.onDismissHandled = false;
+    this.onErrorHandled = false;
     spinnerDiv.style.display = "block";
     // When you call this method, it will display the dhanyatra-container
     newDiv.style.display = "block";
@@ -180,11 +186,19 @@ export class Dhanyatra {
   }
 
   private attachEventListener() {
-    window.addEventListener("message", (event) => this.handleMessage(event));
+    if (!this.eventListenerAttached) {
+      window.addEventListener("message", (event) => this.handleMessage(event));
+      this.eventListenerAttached = true;
+    }
   }
 
   private removeEventListener() {
-    window.removeEventListener("message", (event) => this.handleMessage(event));
+    if (this.eventListenerAttached) {
+      window.removeEventListener("message", (event) =>
+        this.handleMessage(event)
+      );
+      this.eventListenerAttached = false;
+    }
   }
 
   private handleMessage = (event) => {
@@ -217,27 +231,34 @@ export class Dhanyatra {
       "dhanyatraIframe"
     ) as HTMLIFrameElement;
     if (iframe) {
-      this.options.modal.onDismiss(data);
+      if (!this.onDismissHandled) {
+        this.options.modal.onDismiss(data);
+        this.onDismissHandled = true;
+      }
     }
   };
 
   private handlePaymentResponse = (paymentData) => {
     if (
+      !this.onSuccessHandled &&
       this.options &&
       this.options.modal &&
       typeof this.options.modal.onSuccess === "function"
     ) {
       this.options.modal.onSuccess(paymentData);
+      this.onSuccessHandled = true;
     }
   };
 
   private handleErrorResponse = (errorData) => {
     if (
+      !this.onErrorHandled &&
       this.options &&
       this.options.modal &&
       typeof this.options.modal.onError === "function"
     ) {
       this.options.modal.onError(errorData);
+      this.onErrorHandled = true;
     }
   };
 }
