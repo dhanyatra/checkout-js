@@ -108,7 +108,7 @@ interface DhanyatraOptions {
 
 export class Dhanyatra {
   options: DhanyatraOptions;
-  private baseUrl: string = "https://api.dhanyatra.brighthustle.in";
+  private baseUrl: string = "https://checkout.dhanyatra.brighthustle.in";
   private eventListenerAttached: boolean = false;
   private onSuccessHandled: boolean = false;
   private onDismissHandled: boolean = false;
