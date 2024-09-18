@@ -170,6 +170,7 @@ export class Dhanyatra {
 
     // Convert the data to a JSON string
     const messageString = JSON.stringify(this.options);
+    iframe.setAttribute("referrerpolicy", "no-referrer-when-downgrade");
 
     // Send the data to the iframe
     iframe.addEventListener("load", () => {
@@ -182,6 +183,13 @@ export class Dhanyatra {
         iframe.style.display = "block";
       }, 1000);
       // Now, you can safely send data to the iframe or perform other actions.
+    });
+
+    iframe.addEventListener("error", () => {
+      console.error("Iframe failed to load. Retrying...");
+      setTimeout(() => {
+        iframe.src = this.baseUrl; // Retry loading iframe
+      }, 3000);
     });
   }
 
