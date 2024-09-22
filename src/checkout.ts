@@ -162,8 +162,11 @@ export class Dhanyatra {
     iframe.frameBorder = "0";
     iframe.setAttribute("allowTransparency", "true");
 
+    // Add a cache-busting query parameter
+    const cacheBuster = `?_=${new Date().getTime()}`;
+
     // Set the source URL for the iframe
-    iframe.src = this.baseUrl;
+    iframe.src = `${this.baseUrl}${cacheBuster}`;
 
     // Append the iframe to the dhanyatra-container
     newDiv.appendChild(iframe);
@@ -188,7 +191,7 @@ export class Dhanyatra {
     iframe.addEventListener("error", () => {
       console.error("Iframe failed to load. Retrying...");
       setTimeout(() => {
-        iframe.src = this.baseUrl; // Retry loading iframe
+        iframe.src = `${this.baseUrl}${cacheBuster}`;
       }, 3000);
     });
   }
